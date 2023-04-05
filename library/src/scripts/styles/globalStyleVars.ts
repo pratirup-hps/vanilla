@@ -64,6 +64,29 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     );
 
     let colorPrimary = color("#037DBC");
+    let currentURL:any = window.location.host;
+    if(currentURL != "dev.vanilla.localhost"){
+        currentURL = currentURL.split('.')
+    } else {
+        currentURL = "ubuntoo-team.ubuntoo.com"
+        currentURL = currentURL.split('.')
+    }
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", `https://react.sandbox.ubuntoo.com/api/tenant?host=${currentURL[0]}`, false);
+    xhr.onload = function (e) {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                var response = JSON.parse(xhr.responseText);
+                colorPrimary = color(response.primaryColor);
+            } else {
+               console.error(xhr.statusText);
+            }
+        }
+    };
+    xhr.onerror = function (e) {
+    console.error(xhr.statusText);
+    };
+    xhr.send(null);
     if (options.preset === GlobalPreset.DARK) {
         // given better contrast in the dark preset.
         colorPrimary = colorPrimary.lighten(0.25);
